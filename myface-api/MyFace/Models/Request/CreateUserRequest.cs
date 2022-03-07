@@ -21,8 +21,7 @@ namespace MyFace.Models.Request
         public string Username { get; set; }
 
         [Required]
-        [MinLength(12)]
-        [StringLength(70)]
+        [StringLength(70,MinimumLength =12,ErrorMessage = "Password should be min 12 symbols")]
         public string Password { get; set; }
         
         public string ProfileImageUrl { get; set; }
