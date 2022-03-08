@@ -100,12 +100,16 @@ namespace MyFace.Controllers
 
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
+            Console.WriteLine(username);
+            Console.WriteLine(password);
 
             if (!_auth.UserNamePasswordMatch(username, password))
             {
                 return Unauthorized("Username and password do not match");
             }
-            if (!_auth.IsCorrectUser(id, username))
+            var currentPost = _posts.GetById(id);
+
+            if (!_auth.IsCorrectUser(currentPost.UserId, username))
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
