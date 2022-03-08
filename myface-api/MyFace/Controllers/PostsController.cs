@@ -38,7 +38,7 @@ namespace MyFace.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+            //call the function
             var post = _posts.Create(newPost);
 
             var url = Url.Action("GetById", new { id = post.Id });
