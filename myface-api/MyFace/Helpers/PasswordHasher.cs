@@ -6,16 +6,7 @@ namespace MyFace.Helpers
 {
     public class PasswordHasher
     {
-        public string Password { get; set; }
-        public string Salt { get; set; }
-        public PasswordHasher(string password)
-        {
-            byte[] s = GenerateSalt();
-            Password = HashPassword(password, s);
-            Salt = Convert.ToBase64String(s);
-        }
-
-        public byte[] GenerateSalt()
+        public static byte[] GenerateSalt()
         {
             byte[] salt = new byte[128 / 8];
             using (var rngCsp = new RNGCryptoServiceProvider())
@@ -24,7 +15,7 @@ namespace MyFace.Helpers
             }
             return salt;
         }
-        public string HashPassword(string password, byte[] salt)
+        public static string HashPassword(string password, byte[] salt)
         {
             // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
