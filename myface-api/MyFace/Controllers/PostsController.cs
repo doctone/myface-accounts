@@ -7,6 +7,7 @@ using System;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Http;
+using MyFace.Helpers;
 
 namespace MyFace.Controllers
 {
@@ -51,20 +52,8 @@ namespace MyFace.Controllers
             {
                 return Unauthorized();
             }
-
-            var authHeaderString = authHeader[0];
-
-            // authHeader looks like "Basic {base 64 encoded string}"
-
-            var authHeaderSplit = authHeaderString.Split(' ');
-            var authType = authHeaderSplit[0];
-            var encodedUsernamePassword = authHeaderSplit[1];
-
-            var usernamePassword = System.Text.Encoding.UTF8.GetString(
-                Convert.FromBase64String(encodedUsernamePassword)
-            );
-
-            var usernamePasswordArray = usernamePassword.Split(':');
+            
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
 
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
