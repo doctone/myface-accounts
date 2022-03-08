@@ -18,10 +18,13 @@ namespace MyFace.Controllers
         private readonly IPostsRepo _posts;
 
         private readonly IUsersRepo _users;
-        public PostsController(IPostsRepo posts, IUsersRepo users)
+
+        private readonly PasswordAuthorization _auth;
+        public PostsController(IPostsRepo posts, IUsersRepo users, PasswordAuthorization auth)
         {
             _posts = posts;
             _users = users;
+            _auth = auth;
         }
         
         [HttpGet("")]
@@ -52,19 +55,17 @@ namespace MyFace.Controllers
             {
                 return Unauthorized();
             }
-            
+
             var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
 
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
 
-            PasswordAuthorization auth = new PasswordAuthorization();
-
-            if (!auth.UserNamePasswordMatch(username, password, _users))
+            if (!_auth.UserNamePasswordMatch(username, password))
             {
                 return Unauthorized("Username and password do not match");
             }
-            if (!auth.IsCorrectUser(newPost, username, _users))
+            if (!_auth.IsCorrectUser(newPost, username))
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,

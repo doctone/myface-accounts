@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyFace.Repositories;
+using MyFace.Services;
 
 namespace MyFace
 {
@@ -43,6 +44,7 @@ namespace MyFace
             services.AddTransient<IInteractionsRepo, InteractionsRepo>();
             services.AddTransient<IPostsRepo, PostsRepo>();
             services.AddTransient<IUsersRepo, UsersRepo>();
+            services.AddTransient<PasswordAuthorization, PasswordAuthorization>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -15,7 +15,13 @@ namespace MyFace.Services
     }
     public class PasswordAuthorization
     {
-        public bool UserNamePasswordMatch(string username, string password, IUsersRepo _users)
+        private readonly IUsersRepo _users;
+
+        public PasswordAuthorization(IUsersRepo users)
+        {
+            _users = users;
+        }
+        public bool UserNamePasswordMatch(string username, string password)
         {
             User user;
             try
@@ -41,7 +47,7 @@ namespace MyFace.Services
             return true;
         }
 
-        public bool IsCorrectUser(CreatePostRequest newPost, string username, IUsersRepo _users)
+        public bool IsCorrectUser(CreatePostRequest newPost, string username)
         {
             User user = _users.GetByUsername(username);
             return user.Id == newPost.UserId;
