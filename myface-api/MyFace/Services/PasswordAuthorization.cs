@@ -47,10 +47,10 @@ namespace MyFace.Services
             return true;
         }
 
-        public bool IsCorrectUser(CreatePostRequest newPost, string username)
+        public bool IsCorrectUser(int id, string username)
         {
             User user = _users.GetByUsername(username);
-            return user.Id == newPost.UserId;
+            return user.Id == id;
 
         }
     }

@@ -65,7 +65,7 @@ namespace MyFace.Controllers
             {
                 return Unauthorized("Username and password do not match");
             }
-            if (!_auth.IsCorrectUser(newPost, username))
+            if (!_auth.IsCorrectUser(newPost.UserId, username))
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
@@ -87,6 +87,30 @@ namespace MyFace.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+            if (!_auth.IsCorrectUser(id, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to update a post for a different user"
+                );
             }
 
             var post = _posts.Update(id, update);
