@@ -14,7 +14,8 @@ namespace MyFace.Helpers
 {
     public class PasswordAuthorization
     {
-        public bool PassAuthorization(CreatePostRequest newpost)
+        private readonly IUsersRepo _users;
+        public void PassAuthorization(CreatePostRequest newpost)
         {
         var authHeader = Request.Headers["Authorization"];
 
