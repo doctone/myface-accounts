@@ -26,6 +26,23 @@ namespace MyFace.Controllers
         [HttpGet("")]
         public ActionResult<UserListResponse> Search([FromQuery] UserSearchRequest searchRequest)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
             var users = _users.Search(searchRequest);
             var userCount = _users.Count(searchRequest);
             return UserListResponse.Create(searchRequest, users, userCount);
@@ -34,6 +51,23 @@ namespace MyFace.Controllers
         [HttpGet("{id}")]
         public ActionResult<UserResponse> GetById([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
             var user = _users.GetById(id);
             return new UserResponse(user);
         }
@@ -41,6 +75,23 @@ namespace MyFace.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreateUserRequest newUser)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

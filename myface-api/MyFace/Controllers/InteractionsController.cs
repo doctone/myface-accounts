@@ -27,6 +27,23 @@ namespace MyFace.Controllers
         [HttpGet("")]
         public ActionResult<ListResponse<InteractionResponse>> Search([FromQuery] SearchRequest search)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
             var interactions = _interactions.Search(search);
             var interactionCount = _interactions.Count(search);
             return InteractionListResponse.Create(search, interactions, interactionCount);
@@ -35,6 +52,23 @@ namespace MyFace.Controllers
         [HttpGet("{id}")]
         public ActionResult<InteractionResponse> GetById([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+            
             var interaction = _interactions.GetById(id);
             return new InteractionResponse(interaction);
         }

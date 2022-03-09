@@ -30,6 +30,23 @@ namespace MyFace.Controllers
         [HttpGet("")]
         public ActionResult<PostListResponse> Search([FromQuery] PostSearchRequest searchRequest)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
             var posts = _posts.Search(searchRequest);
             var postCount = _posts.Count(searchRequest);
             return PostListResponse.Create(searchRequest, posts, postCount);
@@ -38,6 +55,22 @@ namespace MyFace.Controllers
         [HttpGet("{id}")]
         public ActionResult<PostResponse> GetById([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
             var post = _posts.GetById(id);
             return new PostResponse(post);
         }
