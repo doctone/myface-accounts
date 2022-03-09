@@ -9,11 +9,11 @@ namespace MyFace.Services
 {
     public interface IAuth
     {
-        public bool UserNamePasswordMatch(CreatePostRequest newPost);
+        public bool UserNamePasswordMatch(string username, string password);
 
-        public bool IsCorrectUser(CreatePostRequest newPost, string username);
+        public bool IsCorrectUser(int id, string username);
     }
-    public class PasswordAuthorization
+    public class PasswordAuthorization : IAuth
     {
         private readonly IUsersRepo _users;
 

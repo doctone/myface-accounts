@@ -2,6 +2,10 @@
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
+using MyFace.Services;
+using Microsoft.Extensions.Primitives;
+using MyFace.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace MyFace.Controllers
 {
@@ -11,9 +15,12 @@ namespace MyFace.Controllers
     {
         private readonly IUsersRepo _users;
 
-        public UsersController(IUsersRepo users)
+        private readonly IAuth _auth;
+
+        public UsersController(IUsersRepo users, IAuth auth)
         {
             _users = users;
+            _auth = auth;
         }
         
         [HttpGet("")]
@@ -49,6 +56,31 @@ namespace MyFace.Controllers
         [HttpPatch("{id}/update")]
         public ActionResult<UserResponse> Update([FromRoute] int id, [FromBody] UpdateUserRequest update)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+        
+
+            if (!_auth.IsCorrectUser(id, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to update a user other than your own"
+                );
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
