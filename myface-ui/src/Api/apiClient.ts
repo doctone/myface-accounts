@@ -50,8 +50,13 @@ export async function fetchUsers(searchTerm: string, page: number, pageSize: num
     return await response.json();
 }
 
-export async function fetchUser(userId: string | number): Promise<User> {
-    const response = await fetch(`https://localhost:5001/users/${userId}`);
+export async function fetchUser(userId: string | number, username : string, password: string): Promise<User> {
+    const response = await fetch(`https://localhost:5001/users/${userId}`,  {
+        method: "GET",
+        headers: {
+            "Authorization": "basic " + btoa(`${username}:${password}`)
+        }
+    });
     return await response.json();
 }
 
