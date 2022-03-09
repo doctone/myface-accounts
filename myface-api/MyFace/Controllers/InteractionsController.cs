@@ -6,6 +6,7 @@ using MyFace.Services;
 using Microsoft.Extensions.Primitives;
 using MyFace.Helpers;
 using Microsoft.AspNetCore.Http;
+using MyFace.Models.Database;
 
 namespace MyFace.Controllers
 {
@@ -66,7 +67,7 @@ namespace MyFace.Controllers
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
-                    "You are not allowed to create a post for a different user"
+                    "You are not allowed to interact with posts on behalf of a different user"
                 );
             }
         
@@ -80,6 +81,33 @@ namespace MyFace.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
+            Interaction i = _interactions.GetById(id);
+            
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
+            if (!_auth.IsCorrectUser(i.UserId, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to interact with posts on behalf of a different user"
+                );
+            }
+
             _interactions.Delete(id);
             return Ok();
         }
