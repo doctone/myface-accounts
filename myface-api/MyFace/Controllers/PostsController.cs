@@ -100,8 +100,6 @@ namespace MyFace.Controllers
 
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
-            Console.WriteLine(username);
-            Console.WriteLine(password);
 
             if (!_auth.UserNamePasswordMatch(username, password))
             {
@@ -124,6 +122,32 @@ namespace MyFace.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+            var currentPost = _posts.GetById(id);
+
+            if (!_auth.IsCorrectUser(currentPost.UserId, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to delete a post for a different user"
+                );
+            }
+            
             _posts.Delete(id);
             return Ok();
         }
