@@ -18,6 +18,9 @@ function Routes(): ReactElement {
     }
     
     return (
+        <>
+        <p>Your username: {loginContext.username}</p>
+        <p>Your password: {loginContext.password}</p>
         <Switch>
             <Route exact path="/" component={Feed}/>
             <Route exact path="/users" component={Users}/>
@@ -25,6 +28,7 @@ function Routes(): ReactElement {
             <Route exact path="/new-post" component={CreatePost}/>
             <Route path="" component={NotFound}/>
         </Switch>
+    </>
     );
 }
 
