@@ -1,10 +1,11 @@
-﻿import React, {ReactNode, useEffect, useState} from "react";
+﻿import React, {ReactNode, useEffect, useState, useContext} from "react";
 import {ListResponse} from "../../Api/apiClient";
 import {Grid} from "../Grid/Grid";
 import "./InfiniteList.scss";
+import {LoginContext} from "../LoginManager/LoginManager";
 
 interface InfiniteListProps<T> {
-    fetchItems: (page: number, pageSize: number) => Promise<ListResponse<T>>;
+    fetchItems: (page: number, pageSize: number, username: string, password: string) => Promise<ListResponse<T>>;
     renderItem: (item: T) => ReactNode;
 }
 
@@ -12,6 +13,7 @@ export function InfiniteList<T>(props: InfiniteListProps<T>): JSX.Element {
     const [items, setItems] = useState<T[]>([]);
     const [page, setPage] = useState(1);
     const [hasNextPage, setHasNextPage] = useState(false);
+    const { username, password } = useContext(LoginContext);
 
     function replaceItems(response: ListResponse<T>) {
         setItems(response.items);
@@ -26,12 +28,12 @@ export function InfiniteList<T>(props: InfiniteListProps<T>): JSX.Element {
     }
     
     useEffect(() => {
-        props.fetchItems(1, 10)
+        props.fetchItems(1, 10, username as string,password as string)
             .then(replaceItems);
-    }, [props]);
+    }, [props, username,password]);
 
     function incrementPage() {
-        props.fetchItems(page + 1, 10)
+        props.fetchItems(page + 1, 10, username as string,password as string)
             .then(appendItems);
     }
     
