@@ -2,6 +2,10 @@
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
+using MyFace.Services;
+using Microsoft.Extensions.Primitives;
+using MyFace.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace MyFace.Controllers
 {
@@ -11,9 +15,12 @@ namespace MyFace.Controllers
     {
         private readonly IInteractionsRepo _interactions;
 
-        public InteractionsController(IInteractionsRepo interactions)
+        private readonly PasswordAuthorization _auth;
+
+        public InteractionsController(IInteractionsRepo interactions, PasswordAuthorization auth)
         {
             _interactions = interactions;
+            _auth = auth;
         }
     
         [HttpGet("")]
@@ -37,6 +44,30 @@ namespace MyFace.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+
+            if (!_auth.IsCorrectUser(newUser.UserId, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to create a post for a different user"
+                );
             }
         
             var interaction = _interactions.Create(newUser);
