@@ -93,6 +93,31 @@ namespace MyFace.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
+             var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+        
+
+            if (!_auth.IsCorrectUser(id, username))
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to delete a user other than your own"
+                );
+            }
             _users.Delete(id);
             return Ok();
         }
