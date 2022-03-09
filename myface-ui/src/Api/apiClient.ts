@@ -40,8 +40,13 @@ export interface NewPost {
     userId: number;
 }
 
-export async function fetchUsers(searchTerm: string, page: number, pageSize: number): Promise<ListResponse<User>> {
-    const response = await fetch(`https://localhost:5001/users?search=${searchTerm}&page=${page}&pageSize=${pageSize}`);
+export async function fetchUsers(searchTerm: string, page: number, pageSize: number, username: string, password: string): Promise<ListResponse<User>> {
+    const response = await fetch(`https://localhost:5001/users?search=${searchTerm}&page=${page}&pageSize=${pageSize}`,  {
+        method: "GET",
+        headers: {
+            "Authorization": "basic " + btoa(`${username}:${password}`)
+        }
+    });
     return await response.json();
 }
 
