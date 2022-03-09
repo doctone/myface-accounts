@@ -15,9 +15,9 @@ namespace MyFace.Controllers
     {
         private readonly IUsersRepo _users;
 
-        private readonly IAuth _auth;
+        private readonly PasswordAuthorization _auth;
 
-        public UsersController(IUsersRepo users, IAuth auth)
+        public UsersController(IUsersRepo users, PasswordAuthorization auth)
         {
             _users = users;
             _auth = auth;
