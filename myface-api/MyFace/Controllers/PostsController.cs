@@ -93,21 +93,16 @@ namespace MyFace.Controllers
 
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
+            var UserId = _users.GetByUsername(username).Id;
 
             if (!_auth.UserNamePasswordMatch(username, password))
             {
                 return Unauthorized("Username and password do not match");
             }
-            if (!_auth.IsCorrectUser(newPost.UserId, username))
-            {
-                return StatusCode(
-                    StatusCodes.Status403Forbidden,
-                    "You are not allowed to create a post for a different user"
-                );
-            }
+
 
             //call the function
-            var post = _posts.Create(newPost);
+            var post = _posts.Create(newPost, UserId);
 
             var url = Url.Action("GetById", new { id = post.Id });
             var postResponse = new PostResponse(post);
