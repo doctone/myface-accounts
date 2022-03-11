@@ -13,7 +13,7 @@ export function InfiniteList<T>(props: InfiniteListProps<T>): JSX.Element {
     const [items, setItems] = useState<T[]>([]);
     const [page, setPage] = useState(1);
     const [hasNextPage, setHasNextPage] = useState(false);
-    const { username, password } = useContext(LoginContext);
+    const { logOut,username, password } = useContext(LoginContext); 
 
     function replaceItems(response: ListResponse<T>) {
         setItems(response.items);
@@ -29,7 +29,11 @@ export function InfiniteList<T>(props: InfiniteListProps<T>): JSX.Element {
     
     useEffect(() => {
         props.fetchItems(1, 10, username as string,password as string)
-            .then(replaceItems);
+            .then(replaceItems)            
+            .catch(() => {
+                logOut();
+                });
+            ;
     }, [props, username,password]);
 
     function incrementPage() {
