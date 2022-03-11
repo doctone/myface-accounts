@@ -108,13 +108,16 @@ namespace MyFace.Controllers
             }
         
 
-            if (!_auth.IsCorrectUser(id, username))
+            var currentUser = _users.GetByUsername(username);
+            
+            if (!_auth.IsCorrectUser(id, username) && currentUser.Role != AuthRole.admin)
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
-                    "You are not allowed to update a user other than your own"
+                    "Only admins can update users other than your own"
                 );
             }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -123,7 +126,46 @@ namespace MyFace.Controllers
             var user = _users.Update(id, update);
             return new UserResponse(user);
         }
+
+        [HttpPatch("{id}/update-role")]
         
+        public ActionResult<UserResponse> UpdateRole([FromRoute] int id, [FromBody] UpdateRoleRequest update)
+        {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_auth.UserNamePasswordMatch(username, password))
+            {
+                return Unauthorized("Username and password do not match");
+            }
+            var currentUser = _users.GetByUsername(username);
+            
+            if (currentUser.Role != AuthRole.admin)
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "Only admins can update users' roles"
+                );
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = _users.UpdateRole(id, update);
+            return new UserResponse(user);
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
@@ -145,7 +187,7 @@ namespace MyFace.Controllers
             }
 
             var currentUser = _users.GetByUsername(username);
-            
+
             if (!_auth.IsCorrectUser(id, username) && currentUser.Role != AuthRole.admin)
             {
                 return StatusCode(

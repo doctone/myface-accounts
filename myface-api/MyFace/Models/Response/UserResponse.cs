@@ -20,6 +20,6 @@ namespace MyFace.Models.Response
         public string ProfileImageUrl => _user.ProfileImageUrl;
         public string CoverImageUrl => _user.CoverImageUrl;
 
-        public AuthRole Role => AuthRole.member;
+        public AuthRole Role => _user.Role;
     }
 }

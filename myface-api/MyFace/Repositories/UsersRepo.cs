@@ -15,6 +15,8 @@ namespace MyFace.Repositories
         User GetByUsername(string username);
         User Create(CreateUserRequest newUser);
         User Update(int id, UpdateUserRequest update);
+
+        User UpdateRole(int id, UpdateRoleRequest update);
         void Delete(int id);
     }
     
@@ -103,6 +105,16 @@ namespace MyFace.Repositories
             _context.SaveChanges();
 
             return user;
+        }
+
+        public User UpdateRole(int id, UpdateRoleRequest update)
+        {
+            var user = GetById(id);
+
+            user.Role = update.Role;
+
+            return user;
+
         }
 
         public void Delete(int id)
