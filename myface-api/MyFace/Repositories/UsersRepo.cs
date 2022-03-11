@@ -110,9 +110,9 @@ namespace MyFace.Repositories
         public User UpdateRole(int id, UpdateRoleRequest update)
         {
             var user = GetById(id);
-
             user.Role = update.Role;
-
+            _context.Users.Update(user);
+            _context.SaveChanges();
             return user;
 
         }
