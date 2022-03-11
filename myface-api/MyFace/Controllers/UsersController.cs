@@ -143,13 +143,14 @@ namespace MyFace.Controllers
             {
                 return Unauthorized("Username and password do not match");
             }
-        
 
-            if (!_auth.IsCorrectUser(id, username))
+            var currentUser = _users.GetByUsername(username);
+            
+            if (!_auth.IsCorrectUser(id, username) && currentUser.Role != AuthRole.admin)
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
-                    "You are not allowed to delete a user other than your own"
+                    "Only admins can delete users other than your own"
                 );
             }
             _users.Delete(id);
