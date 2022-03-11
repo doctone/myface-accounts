@@ -149,6 +149,7 @@ namespace MyFace.Data
                 Salt = ConvertedSalt,
                 ProfileImageUrl = ImageGenerator.GetProfileImage(Data[index][2]),
                 CoverImageUrl = ImageGenerator.GetCoverImage(index),
+                Role = AuthRole.member,
             };
         }
     }

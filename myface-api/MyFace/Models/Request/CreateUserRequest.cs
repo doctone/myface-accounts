@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MyFace.Helpers;
+using MyFace.Models.Database;
 
 namespace MyFace.Models.Request
 {
@@ -29,5 +30,7 @@ namespace MyFace.Models.Request
         public string ProfileImageUrl { get; set; }
         
         public string CoverImageUrl { get; set; }
+
+        public AuthRole Role = AuthRole.member;
     }
 }

@@ -81,6 +81,7 @@ namespace MyFace.Repositories
                 Salt = Convert.ToBase64String(salt),
                 ProfileImageUrl = newUser.ProfileImageUrl,
                 CoverImageUrl = newUser.CoverImageUrl,
+                Role = newUser.Role
             });
             _context.SaveChanges();
 

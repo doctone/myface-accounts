@@ -6,6 +6,7 @@ using MyFace.Services;
 using Microsoft.Extensions.Primitives;
 using MyFace.Helpers;
 using Microsoft.AspNetCore.Http;
+using MyFace.Models.Database;
 
 namespace MyFace.Controllers
 {
@@ -75,28 +76,10 @@ namespace MyFace.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreateUserRequest newUser)
         {
-            var authHeader = Request.Headers["Authorization"];
-
-            if (authHeader == StringValues.Empty)
-            {
-                return Unauthorized();
-            }
-
-            var usernamePasswordArray = UsernamePasswordHelper.GetUsernamePassword(authHeader);
-
-            var username = usernamePasswordArray[0];
-            var password = usernamePasswordArray[1];
-
-            if (!_auth.UserNamePasswordMatch(username, password))
-            {
-                return Unauthorized("Username and password do not match");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            
             var user = _users.Create(newUser);
 
             var url = Url.Action("GetById", new { id = user.Id });
